@@ -54,11 +54,9 @@
                   style="width:400px;height:40px;margin-left:30px;"></el-input>
       </div>
       <el-button type="primary"
-                 style="width:95%;margin:0 20px 0 20px;background-color:#009688;"
-                 @click="beforeUpload(files)">上传打印</el-button>
-      <el-progress :text-inside="true"
-                   :stroke-width="26"
-                   :percentage="70"></el-progress>
+                 style="width:95%;margin:0 20px 0 20px;background-color:#009688;position:relative;"
+                 @click="beforeUpload(files)">{{status?'打印成功':'开始打印'}}</el-button>
+      <span :style="{'display':(span_s?'none':'block'),'position':'absolute','top':'50%','left':'50%','transform':'translate(-50%,-50%)'}">打印中....</span>
     </div>
   </div>
 
@@ -76,13 +74,16 @@ export default {
       fileName: '',
       files: '',
       input: '',
-      tableData: []
+      tableData: [],
+      status: false,
+      span_s: true,
     }
   },
   methods: {
     //文件大小检验
     beforeUpload (file) {
       this.files = file;
+      this.span_s = !this.span_s
       const extension = file.name.split('.')[1] === 'jpg'
       const extension2 = file.name.split('.')[1] === 'pdf'
       const extension3 = file.name.split('.')[1] === 'xlsx'
@@ -132,6 +133,8 @@ export default {
 
       sendExel(fileFormData, this.input).then((res) => {
         this.$message.success('上传成功')
+        this.status = !this.status
+        this.span_s = !this.span_s
         console.log(res)
       }).catch((err) => {
         this.$message.error('上传失败')
